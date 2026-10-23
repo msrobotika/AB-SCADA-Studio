@@ -53,8 +53,14 @@ export async function followCore({model,url,token,signal,onChange=()=>{}}){
       retryMs=1000;
       await consume(response.body,event=>{
         const accepted=model.acceptCore(event);
+        if(model.connection.state==="BRECHA"){
+          onChange();
+          throw Error("Secuencia incompleta: intervención necesaria");
+        }
         if(accepted){
-          model.setConnection("CONECTADO","Recibiendo CPU virtual · secuencia "+model.lastSeq);
+          model.setConnection("CONECTADO",model.latest?
+            "CPU virtual y bus Suite · secuencia "+model.lastSeq:
+            "Bus Suite conectado · aún sin snapshot PLC");
           onChange();
         }
       },signal);
