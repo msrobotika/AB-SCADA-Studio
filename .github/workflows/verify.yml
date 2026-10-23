@@ -1,0 +1,44 @@
+name: Verify SCADA
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "docs/screenshots/*.png"
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  unit:
+    name: Node ${{ matrix.node }} / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 12
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {os: ubuntu-latest, node: 20}
+          - {os: ubuntu-latest, node: 22}
+          - {os: windows-latest, node: 22}
+          - {os: macos-latest, node: 22}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - run: npm run check
+  core:
+    name: Actual AB-Suite Core integration
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: msrobotika/AB-Suite-Core-arquitectura-de-integraci-n
+          ref: 53dfed5b674daa107d15eb938617a031da88afa2
+          path: suitecore
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm run test:integration

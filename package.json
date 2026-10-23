@@ -1,0 +1,23 @@
+{
+  "name": "ab-scada-studio",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "MS ROBOTIKA SCADA de supervisión industrial virtual",
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "MIT",
+  "scripts": {
+    "start": "node scripts/serve.mjs",
+    "start:demo": "node scripts/serve.mjs --mode demo",
+    "start:core": "node scripts/serve.mjs --mode core",
+    "test": "node --test tests/*.test.mjs",
+    "check": "node --check src/model.js && node --check src/server.js && node --check src/core-feed.js && node --check src/app.js && node --check scripts/serve.mjs && node --test tests/*.test.mjs",
+    "screenshots": "node scripts/capture.mjs",
+    "test:integration": "node --test tests/integration/core.test.mjs"
+  },
+  "devDependencies": {
+    "playwright": "1.55.1"
+  }
+}

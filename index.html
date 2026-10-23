@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="theme-color" content="#0c1420"/>
+<title>AB-SCADA Studio · MS ROBOTIKA</title>
+<link rel="stylesheet" href="/app.css"/>
+</head><body>
+<svg xmlns="http://www.w3.org/2000/svg" class="sprite" aria-hidden="true">
+<symbol id="ic-silo" viewBox="0 0 64 64"><path d="M13 13h38v20l-10 16H23L13 33V13ZM18 13v-5h28v5M20 38h24M24 49v7M40 49v7M20 56h24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"/><path d="M18 21h28v11H18z" fill="currentColor" opacity=".12"/></symbol>
+<symbol id="ic-scale" viewBox="0 0 64 64"><path d="M11 23h42l-5 16H16l-5-16Zm11 16v12h20V39M32 23V14m-12 0h24M15 51h34" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"/><circle cx="32" cy="32" r="4" fill="currentColor"/></symbol>
+<symbol id="ic-reject" viewBox="0 0 64 64"><path d="M9 42h46M11 33h42m-38-9h22l8 9H15V24Zm29-10v12m-6-6 6 6 6-6M16 45v7m30-7v7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"/></symbol>
+<symbol id="ic-mix" viewBox="0 0 64 64"><path d="M13 17h38v20c0 12-8 17-19 17s-19-5-19-17V17Zm19-9v29m-9-11 9 6 9-6M23 41c6 6 12 6 18 0" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"/></symbol>
+<symbol id="ic-roll" viewBox="0 0 64 64"><rect x="12" y="17" width="40" height="38" rx="4" fill="none" stroke="currentColor" stroke-width="2.6"/><circle cx="24" cy="31" r="7" fill="none" stroke="currentColor" stroke-width="2.6"/><circle cx="40" cy="31" r="7" fill="none" stroke="currentColor" stroke-width="2.6"/><path d="M20 46h24M17 10h30" stroke="currentColor" stroke-width="2.6"/></symbol>
+<symbol id="ic-bath" viewBox="0 0 64 64"><path d="M9 23h46v16c0 9-8 15-23 15S9 48 9 39V23Zm5 17c8-5 12 6 20 0s13-4 16 0M18 16h28" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"/></symbol>
+<symbol id="ic-dryer" viewBox="0 0 64 64"><path d="M9 18h46v35H9zM9 39h46M18 47h28M16 9h32" fill="none" stroke="currentColor" stroke-width="2.6"/><path d="M23 25c-5 6 5 6 0 12m9-12c-5 6 5 6 0 12m9-12c-5 6 5 6 0 12" stroke="currentColor" stroke-width="2.4" fill="none"/></symbol>
+<symbol id="ic-conveyor" viewBox="0 0 64 64"><path d="M8 36h48v13H8zM13 29h16v7H13zM17 49v7m30-7v7M8 56h48" fill="none" stroke="currentColor" stroke-width="2.6"/><circle cx="16" cy="42" r="3" fill="currentColor"/><circle cx="32" cy="42" r="3" fill="currentColor"/><circle cx="48" cy="42" r="3" fill="currentColor"/></symbol>
+</svg>
+<div class="shell">
+<aside class="sidebar">
+  <div class="brand"><div class="brand-icon">AB<span>↗</span></div><div class="brand-text"><b>MS ROBOTIKA</b><small>INDUSTRIAL SOFTWARE</small></div></div>
+  <div class="side-label">ESPACIO DE TRABAJO</div>
+  <nav class="side-nav" aria-label="Navegación">
+    <a href="#general" class="active"><span class="navicon">▦</span> Visión general <span class="nav-counter">01</span></a>
+    <a href="#proceso"><span class="navicon">⌁</span> Sinóptico <span class="nav-counter">02</span></a>
+    <a href="#tendencias"><span class="navicon">⌁</span> Tendencias <span class="nav-counter">03</span></a>
+    <a href="#alarmas"><span class="navicon">♧</span> Alarmas <span id="navAlarmCount" class="nav-counter">0</span></a>
+    <a href="#eventos"><span class="navicon">≡</span> Histórico <span class="nav-counter">05</span></a>
+  </nav>
+  <div class="sidebar-stretch"></div>
+  <div class="side-label">CONEXIONES</div>
+  <div class="side-connection"><span id="side-dot" class="dot ok"></span><div><b id="side-mode">Laboratorio local</b><small id="side-conn">Datos de demostración</small></div></div>
+  <div class="side-device"><span class="device-graphic">▰</span><div><b>AB-Suite Core</b><small>Conector SSE · solo lectura</small></div></div>
+  <div class="side-foot"><span>AB-SCADA Studio</span><b>v0.1.0</b></div>
+</aside>
+<main class="main" id="general">
+  <header class="topbar"><div class="breadcrumbs">PLATAFORMA MS ROBOTIKA <span>/</span> CONTROL DE PRODUCCIÓN <span>/</span> LÍNEA 01</div><div class="top-actions"><span class="live-clock" id="clock">—</span><span class="avatar">OP</span></div></header>
+  <div class="content">
+    <section class="page-heading">
+      <div><div class="eyebrow"><span class="eyebrow-line"></span> CENTRO DE OPERACIONES <span class="eyebrow-version">/ MONITORIZACIÓN</span></div><h1>Supervisión de <em>Línea 01</em></h1><p>Proceso continuo · Recepción, dosificación, tratamiento y salida</p></div>
+      <div class="heading-actions"><span class="read-only"><span class="lock">◇</span> SOLO LECTURA</span><a class="button ghost" href="/api/export.csv" download>⇩ <span>Exportar datos</span></a></div>
+    </section>
+    <div class="source-banner" id="source-banner"><span class="source-icon">◉</span><div><b id="source-title">MODO DEMOSTRACIÓN</b><small id="source-note">Datos sintéticos de laboratorio · No hay PLC ni maquinaria conectada</small></div><span id="source-chip" class="source-chip">SYNTHETIC DATA</span></div>
+    <section class="kpi-grid" aria-label="Indicadores generales">
+      <article class="metric"><div class="metric-title">PRODUCCIÓN ACUMULADA <span class="mini-icon">▥</span></div><div class="metric-number"><strong id="kpi-count" data-testid="count">—</strong><span class="metric-unit">unid.</span></div><div class="metric-foot"><span class="small-dot green"></span><span id="count-note">Lectura del proceso</span></div></article>
+      <article class="metric"><div class="metric-title">EFICIENCIA SIMULADA <span class="mini-icon">⌘</span></div><div class="metric-number"><strong id="kpi-oee">—</strong><span class="metric-unit">%</span></div><div class="metric-foot"><span class="small-dot blue"></span><span id="oee-note">Indicador didáctico · no OEE auditado</span></div></article>
+      <article class="metric"><div class="metric-title">ENERGÍA SIMULADA <span class="mini-icon">ϟ</span></div><div class="metric-number"><strong id="kpi-energy">—</strong><span class="metric-unit">kWh</span></div><div class="metric-foot"><span class="small-dot blue"></span><span id="energy-note">Sin contador industrial real</span></div></article>
+      <article class="metric metric-alert"><div class="metric-title">ALARMAS ACTIVAS <span class="mini-icon">♧</span></div><div class="metric-number"><strong id="kpi-alarm" data-testid="alarms">0</strong><span class="metric-unit">eventos</span></div><div class="metric-foot"><span class="small-dot amber"></span><span id="alarm-note">Estado de supervisión</span></div></article>
+    </section>
+    <section id="proceso" class="panel process-panel">
+      <div class="panel-header"><div><div class="panel-kicker">VISUALIZACIÓN DEL PROCESO</div><h2>Sinóptico de producción <span class="secondary-title">/ Línea 01</span></h2></div><div class="panel-utilities"><span class="legend"><span class="small-dot green"></span> Activo</span><span class="legend"><span class="small-dot amber"></span> Aviso</span><span class="legend"><span class="small-dot muted"></span> Sin datos</span><span id="cpu-status" class="cpu-pill">CPU · DEMO</span></div></div>
+      <div class="flow-viewport"><div class="process-flow" id="line-flow" aria-label="Etapas de Línea 1">
+        <div class="flow-track"></div>
+        <div class="station" data-stage="silos"><div class="stage-upper"><span class="stage-tag">SL-01</span><span class="stage-status">ACTIVO</span></div><div class="stage-illustration"><svg><use href="#ic-silo"/></svg></div><b>Silos</b><small>Materias primas</small><div class="stage-foot"></div></div>
+        <div class="station" data-stage="weigh"><div class="stage-upper"><span class="stage-tag">BW-02</span><span class="stage-status">ACTIVO</span></div><div class="stage-illustration"><svg><use href="#ic-scale"/></svg></div><b>Báscula</b><small>Dosificación</small><div class="stage-foot"></div></div>
+        <div class="station" data-stage="reject"><div class="stage-upper"><span class="stage-tag">RJ-03</span><span class="stage-status">ACTIVO</span></div><div class="stage-illustration"><svg><use href="#ic-reject"/></svg></div><b>Rechazo</b><small>Desvío</small><div class="stage-foot"></div></div>
+        <div class="station" data-stage="mixer"><div class="stage-upper"><span class="stage-tag">MX-04</span><span class="stage-status">ACTIVO</span></div><div class="stage-illustration"><svg><use href="#ic-mix"/></svg></div><b>Mezclador</b><small>Homogeneización</small><div class="stage-foot"></div></div>
+        <div class="station" data-stage="roller"><div class="stage-upper"><span class="stage-tag">LM-05</span><span class="stage-status">ACTIVO</span></div><div class="stage-illustration"><svg><use href="#ic-roll"/></svg></div><b>Laminador</b><small>Formación</small><div class="stage-foot"></div></div>
+        <div class="station" data-stage="bath"><div class="stage-upper"><span class="stage-tag">BT-06</span><span class="stage-status">ACTIVO</span></div><div class="stage-illustration"><svg><use href="#ic-bath"/></svg></div><b>Bañera</b><small>Antiadherente</small><div class="stage-foot"></div></div>
+        <div class="station" data-stage="tunnel"><div class="stage-upper"><span class="stage-tag">DR-07</span><span class="stage-status">ACTIVO</span></div><div class="stage-illustration"><svg><use href="#ic-dryer"/></svg></div><b>Túnel</b><small>Secado</small><div class="stage-foot"></div></div>
+        <div class="station" data-stage="pack"><div class="stage-upper"><span class="stage-tag">CV-08</span><span class="stage-status">ACTIVO</span></div><div class="stage-illustration"><svg><use href="#ic-conveyor"/></svg></div><b>Salida</b><small>Transportador</small><div class="stage-foot"></div></div>
+      </div></div>
+      <div class="process-footer"><span><span class="small-dot green"></span><b id="run-state">PROCESO ACTIVO</b> · <span id="scan-value">Scan —</span></span><span id="process-note">Ciclo industrial ilustrativo · No representa maquinaria real</span></div>
+    </section>
+    <div class="lower-grid">
+      <section id="tendencias" class="panel trends-panel"><div class="panel-header compact"><div><div class="panel-kicker">ANÁLISIS OPERATIVO</div><h2>Tendencias del proceso</h2></div><div class="select-wrap"><label for="trend-select">Variable</label><select id="trend-select"><option value="temperature">Temperatura / °C</option><option value="ai0">Analógica AI0</option><option value="weight">Nivel silos / %</option><option value="count">Contador C0</option></select></div></div>
+        <div class="chart-summary"><strong id="trend-current">—</strong><span id="trend-unit">°C</span><small id="trend-range">Últimas 160 muestras · tiempo simulado</small></div>
+        <div class="chart-container"><svg id="trend-chart" viewBox="0 0 720 222" role="img" aria-label="Gráfico de tendencia"><defs><linearGradient id="chart-fill" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#49d5bf" stop-opacity=".24"/><stop offset="1" stop-color="#49d5bf" stop-opacity="0"/></linearGradient></defs><path id="area-path" fill="url(#chart-fill)"/><path id="line-path" fill="none" stroke="#49d5bf" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><g id="chart-grid"></g></svg><span id="chart-empty" hidden>Variable no disponible en esta fuente</span></div>
+        <div class="chart-labels"><span>MUESTRAS ANTERIORES</span><span>TIEMPO SIMULADO →</span><span>ACTUAL</span></div>
+      </section>
+      <section id="alarmas" class="panel alarms-panel"><div class="panel-header compact"><div><div class="panel-kicker">GESTIÓN DE INCIDENCIAS</div><h2>Centro de alarmas</h2></div><span class="alarm-pill" id="alarm-pill">0 ACTIVAS</span></div>
+        <div id="alarm-list" class="alarm-list"></div>
+        <div class="alarms-footer"><span>El reconocimiento no modifica el PLC.</span><a href="#eventos">Ver histórico →</a></div>
+      </section>
+    </div>
+    <div class="bottom-grid">
+      <section id="eventos" class="panel events-panel"><div class="panel-header compact"><div><div class="panel-kicker">TRAZABILIDAD</div><h2>Registro de eventos</h2></div><span class="tag-neutral">HISTÓRICO DE SESIÓN</span></div>
+      <div class="table-scroll"><table><thead><tr><th>HORA</th><th>TIPO</th><th>DESCRIPCIÓN</th><th>REFERENCIA</th></tr></thead><tbody id="events-body"></tbody></table></div></section>
+      <section class="panel diagnostics"><div class="panel-header compact"><div><div class="panel-kicker">MANTENIMIENTO / LAB</div><h2>Diagnóstico rápido</h2></div></div>
+      <div class="diag-row"><span>Estado de conexión</span><b id="diag-link">SIMULACIÓN</b></div>
+      <div class="diag-row"><span>Fuente de datos</span><b id="diag-source">LOCAL</b></div>
+      <div class="diag-row"><span>Última secuencia</span><b id="diag-seq">—</b></div>
+      <div class="diag-row"><span>Valor analógico AI0</span><b id="diag-ai">—</b></div>
+      <div class="diag-row"><span>Fotocélula I0.3</span><b id="diag-pe">—</b></div>
+      <div class="demo-tools" id="demo-tools"><div class="tools-heading">INYECTAR FALLOS · SOLO DEMOSTRACIÓN</div><div class="tool-buttons"><button id="demo-jam" type="button" class="fault-btn" data-fault="jam">Atasco cinta</button><button id="demo-heat" type="button" class="fault-btn" data-fault="heat">Temperatura</button><button id="demo-low" type="button" class="fault-btn" data-fault="low">Nivel bajo</button></div></div>
+      </section>
+    </div>
+    <footer class="footer"><span>MS ROBOTIKA / AB-SCADA STUDIO © 2026</span><span>MONITORIZACIÓN LOCAL · NO APTO PARA SEGURIDAD FUNCIONAL</span><span>0.1.0 · MIT</span></footer>
+  </div>
+</main>
+</div>
+<div id="toast" role="status" aria-live="polite" class="toast" hidden></div>
+<script type="module" src="/app.js"></script>
+</body></html>
