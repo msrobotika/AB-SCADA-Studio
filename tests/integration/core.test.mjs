@@ -45,3 +45,31 @@ test("SCADA lee eventos desde AB-Suite Core real sin filtrar credenciales a brow
   assert.equal(denied.status,403);
  }finally{await scada.close();await core.close()}
 });
+
+test("SCADA clasifica eventos reales Vision y GRAFCET del bus sin saltos ficticios",async()=>{
+ const core=await startSuiteCore({port:0});
+ const scada=await startScada({mode:"core",port:0,coreUrl:core.url,
+   coreToken:core.tokens.monitor,clock:false});
+ try{
+  core.bus.publish("ab-plc-simulator",{
+   schema:"msrobotika.suite.event.v1",source:"ab-plc-simulator",
+   topic:"plc.status",trace_id:"stage-0",data:{mode:"RUN"}});
+  core.bus.publish("ab-grafcet-studio",{
+   schema:"msrobotika.suite.event.v1",source:"ab-grafcet-studio",
+   topic:"grafcet.stage.changed",trace_id:"stage-1",
+   data:{step_id:"E2",active:true,cycle:3}});
+  core.bus.publish("ab-vision-inspector",{
+   schema:"msrobotika.suite.event.v1",source:"ab-vision-inspector",
+   topic:"vision.inspection.result",trace_id:"inspection-1",
+   data:{image_id:"record-001",passed:false,defects:0,
+    quality_state:"REVIEW_UNVERIFIED",audit_status:"NO_CALIBRATION"}});
+  for(let i=0;i<80&&scada.model.lastSeq<3;i++)await new Promise(ok=>setTimeout(ok,25));
+  const state=await(await fetch(base(scada)+"/api/state")).json();
+  assert.equal(state.sequence,3);
+  assert.equal(state.external.grafcet.stepId,"E2");
+  assert.equal(state.external.vision.passed,false);
+  assert.equal(state.external.notPassed,1);
+  assert.equal(state.alarms.some(a=>a.id==="VISION_REVIEW"),true);
+  assert.equal(state.events.some(e=>e.message.includes("Brecha")),false);
+ }finally{await scada.close();await core.close()}
+});
