@@ -24,6 +24,10 @@ try{
    throw Error("No se visualiza alarma de atasco");
  await page.locator('[data-ack="JAM"]').click();
  await page.getByText("Reconocida por operador",{exact:false}).first().waitFor();
+ await page.evaluate(()=>window.scrollTo({top:0,behavior:"instant"}));
+ await page.waitForTimeout(250);
+ if(await page.evaluate(()=>window.scrollY)!==0)
+   throw Error("Captura desplazada: sidebar fuera de encuadre");
  await page.screenshot({path:"docs/screenshots/scada-alarms.png",fullPage:true,animations:"disabled"});
  await scada.close();scada=null;
  if(errors.length)throw Error("Fallos JavaScript HMI: "+errors.join("; "));
