@@ -47,3 +47,20 @@ test("HTTP 409 de histórico agotado no se ignora",async()=>{
   assert.equal(model.lastSeq,0);
  }finally{controller.abort();await new Promise(ok=>server.close(ok))}
 });
+
+test("brecha no contigua de SSE bloquea la reconexión hasta resync explícito",async()=>{
+ const server=createServer((req,res)=>{
+  res.writeHead(200,{"Content-Type":"text/event-stream"});
+  res.write("data: "+JSON.stringify(sample)+"\n\n");
+  res.write("data: "+JSON.stringify({...sample,sequence:3})+"\n\n");
+ });
+ await new Promise(ok=>server.listen(0,"127.0.0.1",ok));
+ const controller=new AbortController(),model=new ScadaModel({mode:"core"});
+ try{
+  await followCore({model,url:"http://127.0.0.1:"+server.address().port,
+   token:"a".repeat(64),signal:controller.signal});
+  assert.equal(model.connection.state,"BRECHA");
+  assert.equal(model.lastSeq,3);
+  assert.equal(model.events.some(e=>/Brecha/.test(e.message)),true);
+ }finally{controller.abort();await new Promise(ok=>server.close(ok))}
+});
