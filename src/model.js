@@ -53,6 +53,7 @@ export class ScadaModel{
     this.mode=mode;this.now=now;this.capacity=capacity;
     this.latest=null;this.history=[];this.events=[];this.alarms=new Map();
     this.stateVersion=0;this.lastSeq=0;this.receivedAt=0;
+    this.external={grafcet:null,vision:null,inspections:0,notPassed:0};
     this.connection={state:mode==="demo"?"SIMULACIÓN":"ESPERANDO",detail:""};
     this.demo={t:0,jam:false,heat:false,low:false,enabled:true};
     if(mode==="demo")for(let i=0;i<32;i++)this.demoStep();
@@ -104,13 +105,41 @@ export class ScadaModel{
     return true;
   }
   acceptCore(event){
-    const value=parseCoreEvent(event);
-    if(!value)return false;
+    if(!event || event.schema!=="msrobotika.suite.event.v1" ||
+       !Number.isSafeInteger(event.sequence)||event.sequence<1)return false;
+    if(event.sequence<=this.lastSeq)return false;
     if(event.sequence>this.lastSeq+1 && this.lastSeq>0){
       this.connection={state:"BRECHA",detail:"Faltan eventos del bus: "+this.lastSeq+"→"+event.sequence};
       this.event("system","Brecha de secuencias detectada; no asumir continuidad");
     }
-    return this.apply(value);
+    // Core sequence numbers cover ALL topics, not just PLC snapshots.
+    const value=parseCoreEvent(event);
+    if(value)return this.apply(value);
+    this.lastSeq=event.sequence;
+    const d=event.data;
+    if(event.source==="ab-grafcet-studio" && event.topic==="grafcet.stage.changed" &&
+      d && typeof d.step_id==="string" && typeof d.active==="boolean"){
+      this.external.grafcet={stepId:d.step_id.slice(0,80),active:d.active,cycle:d.cycle??null};
+      this.event("grafcet","GRAFCET · etapa "+this.external.grafcet.stepId+
+        (d.active?" activada":" desactivada"));
+      return true;
+    }
+    if(event.source==="ab-vision-inspector" && event.topic==="vision.inspection.result" &&
+      d && typeof d.passed==="boolean" && Number.isSafeInteger(d.defects) && d.defects>=0){
+      const quality=typeof d.quality_state==="string"?d.quality_state.slice(0,70):"SIN_AUDITORÍA";
+      this.external.vision={passed:d.passed,quality,defects:d.defects};
+      this.external.inspections++;
+      if(!d.passed)this.external.notPassed++;
+      this.event("vision","VISIÓN · "+(d.passed?"inspección conforme":
+        "inspección no conforme / pendiente")+" · "+d.defects+" defectos");
+      const review=!d.passed&&(quality==="REVIEW_UNVERIFIED" || d.audit_status!=="VERIFIED");
+      this.alarm("VISION_REVIEW",review,{severity:"warning",
+        label:"Inspección pendiente de verificar",detail:"Resultado Vision sin auditoría verificada"});
+      this.alarm("VISION_REJECT",!d.passed&&!review,{severity:"critical",
+        label:"Producto no conforme detectado",detail:"Resultado publicado por AB-Vision Inspector"});
+      return true;
+    }
+    return false;
   }
   evaluate(){
     const s=this.latest;if(!s)return;
@@ -176,7 +205,7 @@ export class ScadaModel{
     return {
       contract:"msrobotika.scada.snapshot.v1",mode:this.mode,connection:this.connection,
       stale,sourceLabel:this.mode==="demo"?"LABORATORIO · DATOS SINTÉTICOS":"SUITE CORE · PLC VIRTUAL",
-      latest:this.latest,alarms:active,alarmHistory:[...this.alarms.values()],
+      latest:this.latest,external:copy(this.external),alarms:active,alarmHistory:[...this.alarms.values()],
       events:this.events.slice(0,100),history:this.history.slice(-160),
       eventCount:this.events.length,sequence:this.lastSeq,updatedAt:this.receivedAt?
         new Date(this.receivedAt).toISOString():null,line:LINE
