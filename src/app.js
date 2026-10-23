@@ -79,7 +79,7 @@ function renderEvents(events){
     const row=element("tr");
     for(const value of [fmtTime(event.at),
       ({alarm:"ALARMA",recovery:"RESTABLECIDO",ack:"OPERADOR",
-        connection:"CONEXIÓN",system:"SISTEMA",operator:"SIMULACIÓN"})[event.kind]??event.kind,
+        connection:"CONEXIÓN",system:"SISTEMA",operator:"SIMULACIÓN",grafcet:"GRAFCET",vision:"VISIÓN"})[event.kind]??event.kind,
       event.message,event.code??"AB-SCADA"]){
       row.append(element("td",null,value));
     }
@@ -154,6 +154,8 @@ function render(state){
   text("diag-seq",core?state.sequence:"—");
   text("diag-ai",num(s?.ai0,1));
   text("diag-pe",s?(s.photoeye?"ACTIVA":"INACTIVA"):"—");
+  text("diag-grafcet",state.external?.grafcet?(state.external.grafcet.stepId+(state.external.grafcet.active?" · ON":" · OFF")):"—");
+  text("diag-vision",state.external?.inspections?state.external.inspections+" · "+state.external.notPassed+" no conformes":"—");
   $("demo-tools").hidden=core;
   if(!core){
     for(const [fault,value] of [["jam",Boolean(s?.faults?.jam)],

@@ -19,3 +19,5 @@ CORE lee eventos de AB-PLC Simulator a través de AB-Suite Core por loopback. El
 DEMO: JAM, temperatura de túnel ≥ 87 °C, silo ≤ 15 %. CORE: fallos reportados por el proceso virtual y pérdida de frescura de muestras tras 12 s. ACK local sin escritura industrial. Buffer de 600 muestras y 250 eventos en memoria; el servicio no incluye historiador persistente.
 
 La aplicación rechaza Host/Origin ajenos, limita acceso a archivos estáticos y no expone el token de Core a la web. Solo escucha en 127.0.0.1. No hay OPC UA, PLC industrial ni control de seguridad funcional.
+
+GRAFCET y Vision son fuentes adicionales de eventos del bus. SCADA registra la activación de etapas y los resultados de inspección, sin asignarlos falsamente a estaciones físicas; si Vision informa un resultado no conforme, se activa una alarma local de calidad. Un evento intermedio de cualquier tema avanza el cursor global, evitando falsos avisos de pérdida de secuencia.

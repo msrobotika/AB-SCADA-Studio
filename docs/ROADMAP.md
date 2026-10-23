@@ -12,7 +12,7 @@
 - Esquema de tags con unidades, calidad y versionado por estación
 - Historiador persistente con backups y rotación
 - Reglas de alarmas configurables y perfiles de operador
-- Eventos GRAFCET y Vision contextualizados
+- Profundizar en la correlación por línea y lote de eventos GRAFCET/Vision (v0.1 ya recoge su estado y activa avisos básicos)
 - Tendencias multivariable y filtros temporales
 
 ## v0.3+

@@ -85,3 +85,29 @@ test("lecturas del bus pueden señalar atasco real del PLC virtual",()=>{
  m.acceptCore(sample(2,{faults:{jam:false}}));
  assert.equal(m.snapshot().alarms.some(a=>a.id==="JAM"),false);
 });
+
+test("GRAFCET entre snapshots no produce falsa pérdida de secuencia",()=>{
+ const m=new ScadaModel({mode:"core"});
+ assert.equal(m.acceptCore(sample(1)),true);
+ assert.equal(m.acceptCore({schema:"msrobotika.suite.event.v1",sequence:2,
+  source:"ab-grafcet-studio",topic:"grafcet.stage.changed",
+  data:{step_id:"E2",active:true,cycle:4}}),true);
+ assert.equal(m.acceptCore(sample(3)),true);
+ assert.equal(m.lastSeq,3);
+ assert.equal(m.snapshot().connection.state,"ESPERANDO");
+ assert.equal(m.snapshot().external.grafcet.stepId,"E2");
+ assert.equal(m.events.some(x=>x.message.includes("Brecha")),false);
+});
+test("Vision sin auditoría activa advertencia; nuevo resultado conforme la retira",()=>{
+ const m=new ScadaModel({mode:"core"});
+ const vision=(seq,passed,quality)=>({schema:"msrobotika.suite.event.v1",
+  sequence:seq,source:"ab-vision-inspector",topic:"vision.inspection.result",
+  data:{image_id:"record-"+seq,passed,defects:0,quality_state:quality,
+   audit_status:passed?"VERIFIED":"NO_CALIBRATION"}});
+ assert.equal(m.acceptCore(vision(1,false,"REVIEW_UNVERIFIED")),true);
+ assert.equal(m.snapshot().alarms.some(x=>x.id==="VISION_REVIEW"),true);
+ assert.equal(m.snapshot().external.notPassed,1);
+ assert.equal(m.acceptCore(vision(2,true,"OK_VERIFIED")),true);
+ assert.equal(m.snapshot().alarms.some(x=>x.id==="VISION_REVIEW"),false);
+ assert.equal(m.snapshot().external.inspections,2);
+});
